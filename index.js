@@ -42,6 +42,21 @@ client.on('interactionCreate', async (interaction) => {
     if (commandName === '안녕') {
       await interaction.reply('안녕하세요. ' + interaction.user.username + '님!');
     }
+
+    if (interaction.commandName === '피어리스') {
+      // 하위 명령어(subcommand)의 이름을 가져옵니다.
+      const subcommand = interaction.options.getSubcommand();
+
+      if (subcommand === '추가') {
+        const championName = interaction.options.getString('챔피언이름');
+        await interaction.reply(`'${championName}' 챔피언을 피어리스 목록에 추가했습니다.`);
+      } else if (subcommand === '삭제') {
+        const championName = interaction.options.getString('챔피언이름');
+        await interaction.reply(`'${championName}' 챔피언을 피어리스 목록에서 삭제했습니다.`);
+      } else if (subcommand === '확인') {
+        await interaction.reply('챔피언 목록 확인');
+      }
+  }
 });
 
 // 봇 토큰을 사용하여 디스코드에 로그인합니다.

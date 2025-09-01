@@ -7,6 +7,35 @@ const commands = [
   new SlashCommandBuilder()
       .setName('안녕') // 명령어 이름은 소문자
       .setDescription('봇에게 인사합니다.'),
+  
+  new SlashCommandBuilder()
+      .setName('피어리스')
+      .setDescription('피어리스 관련 명령어')
+      .addSubcommand(subcommand =>
+        subcommand
+          .setName('추가')
+          .setDescription('피어리스 목록에 챔피언을 추가합니다.')
+          .addStringOption(option =>
+              option.setName('챔피언이름')
+                  .setDescription('추가할 챔피언의 이름을 입력해주세요.')
+                  .setRequired(true)
+          )
+      )
+      .addSubcommand(subcommand =>
+        subcommand
+          .setName('삭제')
+          .setDescription('피어리스 목록에서 챔피언을 삭제합니다.')
+          .addStringOption(option =>
+              option.setName('챔피언이름')
+                  .setDescription('삭제할 챔피언의 이름을 입력해주세요.')
+                  .setRequired(true)
+          )
+      )
+      .addSubcommand(subcommand =>
+        subcommand
+          .setName('확인')
+          .setDescription('피어리스 챔피언 목록을 확인합니다.')
+      ),
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
