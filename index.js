@@ -32,6 +32,9 @@ process.on('SIGTERM', () => {
     process.exit(0);
 });
 
+// 피어리스 챔피언 목록
+const fearlessList = [];
+
 // 메시지가 생성될 때마다 실행됩니다.
 client.on('interactionCreate', async (interaction) => {
     // 봇 자신이 보낸 메시지는 무시합니다.
@@ -49,12 +52,29 @@ client.on('interactionCreate', async (interaction) => {
 
       if (subcommand === '추가') {
         const championName = interaction.options.getString('챔피언이름');
-        await interaction.reply(`'${championName}' 챔피언을 피어리스 목록에 추가했습니다.`);
+
+        // 중복일 경우 넘김
+        if(fearlessList.includes(championName)) {
+          await interaction.reply(`'${championName}' 챔피언은 이미 등록되어 있습니다.`);
+        } else {
+          fearlessList.push(championName);
+          await interaction.reply(`'${championName}' 챔피언을 피어리스 목록에 추가했습니다.`);
+        }
       } else if (subcommand === '삭제') {
         const championName = interaction.options.getString('챔피언이름');
-        await interaction.reply(`'${championName}' 챔피언을 피어리스 목록에서 삭제했습니다.`);
+
+        if(!fearlessList.includes(championName)) {
+          await interaction.reply(`'${championName}' 챔피언은 등록되어있지 않습니다.`);
+        } else {
+          fearlessList.splice(fearlessList.indexOf(championName), 1);
+          await interaction.reply(`'${championName}' 챔피언을 피어리스 목록에서 삭제했습니다.`);
+        }
       } else if (subcommand === '확인') {
-        await interaction.reply('챔피언 목록 확인');
+        if(fearlessList.length === 0) {
+          await interaction.reply('추가된 챔피언이 존재하지 않습니다.');
+        } else {
+          await interaction.reply(fearlessList);
+        }
       }
   }
 });
