@@ -41,6 +41,24 @@ const fearlessList = {
   support: []
 };
 
+// 임베드 생성 공용 함수 (중복 제거)
+const embedConfigs = [
+    { key: 'top', title: '탑', color: 0xE74C3C },
+    { key: 'jungle', title: '정글', color: 0x27AE60 },
+    { key: 'mid', title: '미드', color: 0x2980B9 },
+    { key: 'ad', title: '원딜', color: 0xF1C40F },
+    { key: 'support', title: '서폿', color: 0x1ABC9C },
+];
+
+const buildFearlessEmbeds = (list) => {
+    return embedConfigs.map(({ key, title, color }) =>
+        new EmbedBuilder()
+            .setTitle(title)
+            .setColor(color)
+            .setDescription(list[key].length ? list[key].join(', ') : '없음')
+    );
+}
+
 // 메시지가 생성될 때마다 실행됩니다.
 client.on('interactionCreate', async (interaction) => {
     // 봇 자신이 보낸 메시지는 무시합니다.
@@ -92,35 +110,16 @@ client.on('interactionCreate', async (interaction) => {
             ephemeral: true
           });
         }
-      } else if (subcommand === '확인') {
-        const topEmbed = new EmbedBuilder()
-          .setTitle('탑')
-          .setColor(0xE74C3C)
-          .setDescription(fearlessList.top.length ? fearlessList.top.join(', ') : '없음');
-
-        const jungleEmbed = new EmbedBuilder()
-          .setTitle('정글')
-          .setColor(0x27AE60)
-          .setDescription(fearlessList.jungle.length ? fearlessList.jungle.join(', ') : '없음');
-
-        const midEmbed = new EmbedBuilder()
-          .setTitle('미드')
-          .setColor(0x2980B9)
-          .setDescription(fearlessList.mid.length ? fearlessList.mid.join(', ') : '없음');
-
-        const adEmbed = new EmbedBuilder()
-          .setTitle('원딜')
-          .setColor(0xF1C40F)
-          .setDescription(fearlessList.ad.length ? fearlessList.ad.join(', ') : '없음');
-
-        const supportEmbed = new EmbedBuilder()
-          .setTitle('서폿')
-          .setColor(0x1ABC9C)
-          .setDescription(fearlessList.support.length ? fearlessList.support.join(', ') : '없음');
-        
+      } else if (subcommand === ('확인')) {
+        const embeds = buildFearlessEmbeds(fearlessList);
         await interaction.reply({
-          embeds: [topEmbed, jungleEmbed, midEmbed, adEmbed, supportEmbed],
+          embeds,
           ephemeral: true
+        });
+      } else if (subcommand === ('공지')) {
+        const embeds = buildFearlessEmbeds(fearlessList);
+        await interaction.reply({
+          embeds,
         });
       }
   }

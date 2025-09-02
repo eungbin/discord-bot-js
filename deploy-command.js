@@ -59,7 +59,12 @@ const commands = [
         subcommand
           .setName('확인')
           .setDescription('피어리스 챔피언 목록을 확인합니다.')
-      ),
+      )
+      .addSubcommand(subcommand =>
+        subcommand
+          .setName('공지')
+          .setDescription('피어리스 챔피언 목록을 전체에게 공지합니다.')
+      )
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
