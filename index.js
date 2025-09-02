@@ -2,7 +2,7 @@
 import 'dotenv/config';
 
 // discord.js 모듈에서 필요한 클래스를 가져옵니다.
-import { Client, GatewayIntentBits, InteractionType } from 'discord.js';
+import { Client, GatewayIntentBits, InteractionType, EmbedBuilder } from 'discord.js';
 
 // 봇 클라이언트를 생성합니다.
 const client = new Client({
@@ -33,7 +33,13 @@ process.on('SIGTERM', () => {
 });
 
 // 피어리스 챔피언 목록
-const fearlessList = [];
+const fearlessList = {
+  top: ['가렌', '나서스', '제이스', '아트록스', '오른', '다리우스', '요릭', '초가스', '트린다미어', '럼블'],
+  jungle: ['리신, 니달리'],
+  mid: ['아리', '제라스'],
+  ad: ['카이사', '이즈리얼'],
+  support: ['노틸러스', '카르마']
+};
 
 // 메시지가 생성될 때마다 실행됩니다.
 client.on('interactionCreate', async (interaction) => {
@@ -43,7 +49,10 @@ client.on('interactionCreate', async (interaction) => {
     const { commandName } = interaction;
 
     if (commandName === '안녕') {
-      await interaction.reply('안녕하세요. ' + interaction.user.username + '님!');
+      await interaction.reply({
+        content: '안녕하세요. ' + interaction.user.username + '님!',
+        ephemeral: true
+      });
     }
 
     if (interaction.commandName === '피어리스') {
@@ -51,30 +60,68 @@ client.on('interactionCreate', async (interaction) => {
       const subcommand = interaction.options.getSubcommand();
 
       if (subcommand === '추가') {
-        const championName = interaction.options.getString('챔피언이름');
+        const line = interaction.options.getString('라인');
+        const championName = interaction.options.getString('챔피언');
 
         // 중복일 경우 넘김
-        if(fearlessList.includes(championName)) {
-          await interaction.reply(`'${championName}' 챔피언은 이미 등록되어 있습니다.`);
+        if(fearlessList[line].includes(championName)) {
+          await interaction.reply({
+            content: `'${championName}' 챔피언은 이미 등록되어 있습니다.`,
+            ephemeral: true
+          });
         } else {
-          fearlessList.push(championName);
-          await interaction.reply(`'${championName}' 챔피언을 피어리스 목록에 추가했습니다.`);
+          fearlessList[line].push(championName);
+          await interaction.reply({
+            content: `'${championName}' 챔피언을 피어리스 목록에 추가했습니다.`,
+            ephemeral: true
+          });
         }
       } else if (subcommand === '삭제') {
-        const championName = interaction.options.getString('챔피언이름');
+        const line = interaction.options.getString('라인');
+        const championName = interaction.options.getString('챔피언');
 
-        if(!fearlessList.includes(championName)) {
-          await interaction.reply(`'${championName}' 챔피언은 등록되어있지 않습니다.`);
+        if(!fearlessList[line].includes(championName)) {
+          await interaction.reply({
+            content: `'${championName}' 챔피언은 등록되어있지 않습니다.`,
+            ephemeral: true
+          });
         } else {
-          fearlessList.splice(fearlessList.indexOf(championName), 1);
-          await interaction.reply(`'${championName}' 챔피언을 피어리스 목록에서 삭제했습니다.`);
+          fearlessList[line].splice(fearlessList[line].indexOf(championName), 1);
+          await interaction.reply({
+            content: `'${championName}' 챔피언을 피어리스 목록에서 삭제했습니다.`,
+            ephemeral: true
+          });
         }
       } else if (subcommand === '확인') {
-        if(fearlessList.length === 0) {
-          await interaction.reply('추가된 챔피언이 존재하지 않습니다.');
-        } else {
-          await interaction.reply(fearlessList);
-        }
+        const topEmbed = new EmbedBuilder()
+          .setTitle('탑')
+          .setColor(0xE74C3C)
+          .setDescription(fearlessList.top.length ? fearlessList.top.join(', ') : '없음');
+
+        const jungleEmbed = new EmbedBuilder()
+          .setTitle('정글')
+          .setColor(0x27AE60)
+          .setDescription(fearlessList.jungle.length ? fearlessList.jungle.join(', ') : '없음');
+
+        const midEmbed = new EmbedBuilder()
+          .setTitle('미드')
+          .setColor(0x2980B9)
+          .setDescription(fearlessList.mid.length ? fearlessList.mid.join(', ') : '없음');
+
+        const adEmbed = new EmbedBuilder()
+          .setTitle('원딜')
+          .setColor(0xF1C40F)
+          .setDescription(fearlessList.ad.length ? fearlessList.ad.join(', ') : '없음');
+
+        const supportEmbed = new EmbedBuilder()
+          .setTitle('서폿')
+          .setColor(0x1ABC9C)
+          .setDescription(fearlessList.support.length ? fearlessList.support.join(', ') : '없음');
+        
+        await interaction.reply({
+          embeds: [topEmbed, jungleEmbed, midEmbed, adEmbed, supportEmbed],
+          ephemeral: true
+        });
       }
   }
 });
