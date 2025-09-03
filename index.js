@@ -110,16 +110,28 @@ client.on('interactionCreate', async (interaction) => {
             ephemeral: true
           });
         }
-      } else if (subcommand === ('확인')) {
+      } else if (subcommand === '확인') {
         const embeds = buildFearlessEmbeds(fearlessList);
         await interaction.reply({
           embeds,
           ephemeral: true
         });
-      } else if (subcommand === ('공지')) {
+      } else if (subcommand === '공지') {
         const embeds = buildFearlessEmbeds(fearlessList);
         await interaction.reply({
           embeds,
+        });
+      } else if (subcommand === '초기화') {
+        // fearlessList의 모든 라인을 빈 배열로 초기화
+        fearlessList.top = [];
+        fearlessList.jungle = [];
+        fearlessList.mid = [];
+        fearlessList.ad = [];
+        fearlessList.support = [];
+        
+        await interaction.reply({
+          content: '피어리스 목록이 초기화되었습니다.',
+          ephemeral: true
         });
       }
   }
