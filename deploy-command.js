@@ -35,6 +35,16 @@ const commands = [
       )
       .addSubcommand(subcommand =>
         subcommand
+          .setName('자동추가')
+          .setDescription('최근 경기에서 10인 챔피언을 자동으로 피어리스에 추가')
+          .addStringOption(option =>
+            option.setName('닉네임')
+              .setDescription('소환사 이름#태그 (예: Hide on bush#KR1)')
+              .setRequired(true)
+          )
+      )
+      .addSubcommand(subcommand =>
+        subcommand
           .setName('삭제')
           .setDescription('피어리스 목록에서 챔피언을 삭제합니다.')
           .addStringOption(option => 
