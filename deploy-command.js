@@ -37,23 +37,11 @@ const commands = [
         subcommand
           .setName('삭제')
           .setDescription('피어리스 목록에서 챔피언을 삭제합니다.')
-          .addStringOption(option =>
-            option.setName('라인')
-                .setDescription('삭제할 챔피언의 라인을 지정해주세요. (탑, 정글, 미드, 원딜, 서폿)')
-                .setRequired(true)
-                .addChoices(
-                  { name: '탑', value: 'top' },
-                    { name: '정글', value: 'jungle' },
-                    { name: '미드', value: 'mid' },
-                    { name: '원딜', value: 'ad' },
-                    { name: '서폿', value: 'support' }
-                )
-        )
-        .addStringOption(option => 
+          .addStringOption(option => 
             option.setName('챔피언')
                 .setDescription('삭제할 챔피언의 이름을 입력해주세요.')
                 .setRequired(true)
-        )
+          )
       )
       .addSubcommand(subcommand =>
         subcommand
@@ -69,6 +57,16 @@ const commands = [
         subcommand
           .setName('초기화')
           .setDescription('피어리스 챔피언 목록을 초기화합니다.')
+      )
+      .addSubcommand(subcommand =>
+        subcommand
+          .setName('검색')
+          .setDescription('피어리스 챔피언 목록을 탐색합니다.')
+          .addStringOption(option => 
+            option.setName('챔피언')
+                .setDescription('검색할 챔피언의 이름을 입력해주세요.')
+                .setRequired(true)
+          )
       )
 ];
 

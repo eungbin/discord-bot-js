@@ -34,11 +34,20 @@ process.on('SIGTERM', () => {
 
 // 피어리스 챔피언 목록
 const fearlessList = {
-  top: [],
-  jungle: [],
-  mid: [],
-  ad: [],
-  support: []
+  top: ['가렌','나서스','갱플랭크','다리우스','아트록스','피오라','카밀','요릭','제이스','문도박사'],
+  jungle: ['가렌','나서스','갱플랭크','다리우스','아트록스','피오라','카밀','요릭','제이스','문도박사'],
+  mid: ['가렌','나서스','갱플랭크','다리우스','아트록스','피오라','카밀','요릭','제이스','문도박사'],
+  ad: ['가렌','나서스','갱플랭크','다리우스','아트록스','피오라','카밀','요릭','제이스','문도박사'],
+  support: ['가렌','나서스','갱플랭크','다리우스','아트록스','피오라','카밀','요릭','제이스','문도박사']
+};
+
+// 라인 한글 표기 맵핑
+const lineDisplayNames = {
+  top: '탑',
+  jungle: '정글',
+  mid: '미드',
+  ad: '원딜',
+  support: '서폿'
 };
 
 // 임베드 생성 공용 함수 (중복 제거)
@@ -81,10 +90,12 @@ client.on('interactionCreate', async (interaction) => {
         const line = interaction.options.getString('라인');
         const championName = interaction.options.getString('챔피언');
 
-        // 중복일 경우 넘김
-        if(fearlessList[line].includes(championName)) {
+        // 모든 라인에서 중복 확인
+        const existingLine = Object.keys(fearlessList).find(key => fearlessList[key].includes(championName));
+
+        if (existingLine) {
           await interaction.reply({
-            content: `'${championName}' 챔피언은 이미 등록되어 있습니다.`,
+            content: `'${championName}' 챔피언은 이미 ${lineDisplayNames[existingLine]} 라인에 등록되어 있습니다.`,
             ephemeral: true
           });
         } else {
@@ -95,18 +106,20 @@ client.on('interactionCreate', async (interaction) => {
           });
         }
       } else if (subcommand === '삭제') {
-        const line = interaction.options.getString('라인');
         const championName = interaction.options.getString('챔피언');
 
-        if(!fearlessList[line].includes(championName)) {
+        // 모든 라인에서 챔피언 존재 여부 확인 후 삭제
+        const existingLine = Object.keys(fearlessList).find(key => fearlessList[key].includes(championName));
+
+        if (!existingLine) {
           await interaction.reply({
             content: `'${championName}' 챔피언은 등록되어있지 않습니다.`,
             ephemeral: true
           });
         } else {
-          fearlessList[line].splice(fearlessList[line].indexOf(championName), 1);
+          fearlessList[existingLine].splice(fearlessList[existingLine].indexOf(championName), 1);
           await interaction.reply({
-            content: `'${championName}' 챔피언을 피어리스 목록에서 삭제했습니다.`,
+            content: `'${championName}' 챔피언을 피어리스 목록(${lineDisplayNames[existingLine]})에서 삭제했습니다.`,
             ephemeral: true
           });
         }
@@ -133,6 +146,21 @@ client.on('interactionCreate', async (interaction) => {
           content: '피어리스 목록이 초기화되었습니다.',
           ephemeral: true
         });
+      } else if (subcommand === '검색') {
+        const championName = interaction.options.getString('챔피언');
+        const existingLine = Object.keys(fearlessList).find(key => fearlessList[key].includes(championName));
+
+        if (existingLine) {
+          await interaction.reply({
+            content: `'${championName}' 챔피언은 ${lineDisplayNames[existingLine]} 라인에 등록되어 있습니다.`,
+            ephemeral: true
+          });
+        } else {
+          await interaction.reply({
+            content: `'${championName}' 챔피언은 등록되어 있지 않습니다.`,
+            ephemeral: true
+          });
+        }
       }
   }
 });
