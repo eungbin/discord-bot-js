@@ -3,6 +3,8 @@ import 'dotenv/config';
 
 // discord.js 모듈에서 필요한 클래스를 가져옵니다.
 import { Client, GatewayIntentBits, InteractionType, EmbedBuilder } from 'discord.js';
+import { validateChampionName } from './utils/validateChampion.js';
+import { loadChampionList } from './utils/champions.js';
 
 // 봇 클라이언트를 생성합니다.
 const client = new Client({
@@ -15,9 +17,20 @@ const client = new Client({
 });
 
 // 봇이 준비되면 한 번만 실행됩니다.
-client.once('clientReady', () => {
+client.once('clientReady', async () => {
     console.log(`봇이 ${client.user.tag} 이름으로 로그인했습니다!`);
+    try {
+        await loadChampionList(true);
+        console.log('챔피언 데이터 로드 완료.');
+    } catch (e) {
+        console.error('챔피언 데이터 로드 실패:', e);
+    }
 });
+
+// 주기적 갱신(하루 1회)
+setInterval(() => {
+    loadChampionList(true).catch(() => {});
+}, 24 * 60 * 60 * 1000);
 
 // 봇이 종료될 때 실행됩니다.
 process.on('SIGINT', () => {
@@ -88,7 +101,20 @@ client.on('interactionCreate', async (interaction) => {
 
       if (subcommand === '추가') {
         const line = interaction.options.getString('라인');
-        const championName = interaction.options.getString('챔피언');
+        const championInput = interaction.options.getString('챔피언');
+
+        const validation = await validateChampionName(championInput);
+        if (!validation.ok) {
+          const suggestions = validation.suggestions && validation.suggestions.length
+            ? `\n혹시 다음 중 하나를 의미하셨나요? ${validation.suggestions.map(s => s.name).join(', ')}`
+            : '';
+          await interaction.reply({
+            content: `'${championInput}' 은(는) 유효한 챔피언이 아닙니다.${suggestions}`,
+            ephemeral: true
+          });
+          return;
+        }
+        const championName = validation.officialKR;
 
         // 모든 라인에서 중복 확인
         const existingLine = Object.keys(fearlessList).find(key => fearlessList[key].includes(championName));
@@ -106,7 +132,19 @@ client.on('interactionCreate', async (interaction) => {
           });
         }
       } else if (subcommand === '삭제') {
-        const championName = interaction.options.getString('챔피언');
+        const championInput = interaction.options.getString('챔피언');
+        const validation = await validateChampionName(championInput);
+        if (!validation.ok) {
+          const suggestions = validation.suggestions && validation.suggestions.length
+            ? `\n혹시 다음 중 하나를 의미하셨나요? ${validation.suggestions.map(s => s.name).join(', ')}`
+            : '';
+          await interaction.reply({
+            content: `'${championInput}' 은(는) 유효한 챔피언이 아닙니다.${suggestions}`,
+            ephemeral: true
+          });
+          return;
+        }
+        const championName = validation.officialKR;
 
         // 모든 라인에서 챔피언 존재 여부 확인 후 삭제
         const existingLine = Object.keys(fearlessList).find(key => fearlessList[key].includes(championName));
@@ -147,7 +185,19 @@ client.on('interactionCreate', async (interaction) => {
           ephemeral: true
         });
       } else if (subcommand === '검색') {
-        const championName = interaction.options.getString('챔피언');
+        const championInput = interaction.options.getString('챔피언');
+        const validation = await validateChampionName(championInput);
+        if (!validation.ok) {
+          const suggestions = validation.suggestions && validation.suggestions.length
+            ? `\n혹시 다음 중 하나를 의미하셨나요? ${validation.suggestions.map(s => s.name).join(', ')}`
+            : '';
+          await interaction.reply({
+            content: `'${championInput}' 은(는) 유효한 챔피언이 아닙니다.${suggestions}`,
+            ephemeral: true
+          });
+          return;
+        }
+        const championName = validation.officialKR;
         const existingLine = Object.keys(fearlessList).find(key => fearlessList[key].includes(championName));
 
         if (existingLine) {
